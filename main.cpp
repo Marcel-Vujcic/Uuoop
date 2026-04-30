@@ -1,102 +1,91 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <list>
-#include <sstream>
-#include <cstdlib>
+#include <stdexcept>
 using namespace std;
 
+#define MAX 20
+
 int main() {
+    string imena[MAX];
+    int n = 0, izbor;
 
-    // ===== ZAD 1 =====
-    ifstream f1("tekst.txt");
-    vector<string> v;
-    string s;
+    do {
+        cout << "\n1. Unos imena\n2. Ispis\n3. Spremanje\n4. Ucitavanje\n5. Izlaz\nIzbor: ";
+        cin >> izbor;
 
-    while (getline(f1, s)) v.push_back(s);
+        try {
 
-    for (auto x : v) cout << x << endl;
-    for (int i = 0; i < v.size(); i++) cout << v[i] << endl;
-    for (auto it = v.begin(); it != v.end(); it++) cout << *it << endl;
+            switch (izbor) {
 
-    list<string> l(v.begin(), v.end());
-    for (auto x : l) cout << x << endl;
+            case 1:
+                do {
+                    cout << "Unesi N (<20): ";
+                    cin >> n;
+                } while (n <= 0 || n >= 20);
 
+                for (int i = 0; i < n; i++) {
+                    cout << "Ime " << i + 1 << ": ";
+                    cin >> imena[i];
+                }
+                break;
 
-    // ===== ZAD 2 =====
-    list<int> brojevi;
-    int x;
+            case 2:
+                for (int i = 0; i < n; i++)
+                    cout << imena[i] << endl;
+                break;
 
-    while (cin >> x) brojevi.push_back(x);
+            case 3: {
+                string file;
+                cout << "Naziv datoteke: ";
+                cin >> file;
 
-    if (!brojevi.empty()) {
-        int min = *brojevi.begin(), max = *brojevi.begin();
+                ofstream f(file);
 
-        for (int n : brojevi) {
-            if (n < min) min = n;
-            if (n > max) max = n;
+                if (!f)
+                    throw runtime_error("Ne mogu otvoriti datoteku za pisanje!");
+
+                f << n << endl;
+                for (int i = 0; i < n; i++)
+                    f << imena[i] << endl;
+
+                f.close();
+                break;
+            }
+
+            case 4: {
+                string file;
+                cout << "Naziv datoteke: ";
+                cin >> file;
+
+                ifstream f(file);
+
+                if (!f)
+                    throw runtime_error("Ne mogu otvoriti datoteku za citanje!");
+
+                f >> n;
+
+                if (!f)
+                    throw runtime_error("Greska pri citanju broja!");
+
+                for (int i = 0; i < n; i++) {
+                    f >> imena[i];
+
+                    if (!f)
+                        throw runtime_error("Greska pri citanju imena!");
+                }
+
+                f.close();
+                break;
+            }
+
+            }
+
+        }
+        catch (exception& e) {
+            cout << "Greska: " << e.what() << endl;
         }
 
-        cout << "Min: " << min << " Max: " << max << endl;
-    }
-
-
-    // ===== ZAD 3 =====
-    ofstream f2("random.txt");
-    for (int i = 0; i < 10000; i++)
-        f2 << rand() << endl;
-
-
-    // ===== ZAD 4 =====
-    int n;
-    cin >> n;
-
-    vector<int> a(n), b(n);
-
-    for (int& x : a) cin >> x;
-    for (int& x : b) cin >> x;
-
-    int skalarni = 0;
-    for (int i = 0; i < n; i++)
-        skalarni += a[i] * b[i];
-
-    cout << "Skalarni: " << skalarni << endl;
-
-
-    // ===== ZAD 5a =====
-    int r, c;
-    cin >> r >> c;
-
-    vector<vector<double>> m(r, vector<double>(c));
-
-    for (auto& row : m)
-        for (auto& x : row) cin >> x;
-
-    for (auto row : m) {
-        for (auto x : row) cout << x << " ";
-        cout << endl;
-    }
-
-
-    // ===== ZAD 5b =====
-    vector<vector<double>> m2;
-    string line;
-
-    cin.ignore(); // očisti buffer
-
-    while (getline(cin, line) && line != "") {
-        stringstream ss(line);
-        vector<double> row;
-        double x;
-
-        while (ss >> x) row.push_back(x);
-        m2.push_back(row);
-    }
-
-    for (auto r : m2) {
-        for (auto x : r) cout << x << " ";
-        cout << endl;
-    }
+    } while (izbor != 5);
 
     return 0;
 }
